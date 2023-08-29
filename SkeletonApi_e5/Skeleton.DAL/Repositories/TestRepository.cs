@@ -15,7 +15,7 @@ public class TestRepository : BaseRepository<Test>, ITestRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Test>> GetByIdWithQuestionsAsync(Guid id)
+    public Task<Test> GetByIdWithQuestionsAsync(Guid id)
     {
         throw new NotImplementedException();
     }

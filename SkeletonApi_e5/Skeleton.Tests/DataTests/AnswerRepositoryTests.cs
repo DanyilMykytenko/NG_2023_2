@@ -88,4 +88,24 @@ public class AnswerRepositoryTests
 
         Assert.That(context.Answers.Count(), !Is.EqualTo(RepositoryData.ExpectedAnswers.Count()), message: "DeleteByIdAsync works incorrect");
     }
+
+    [TestCase("aa6cc972-2650-44c3-8a8e-134e4e7cf8df")]
+    [TestCase("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
+    public async Task AnswerRepository_GetAllByQuestionIdAsync_AnswersAreReturned(string id)
+    {
+        using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
+
+        var answerRepository = new AnswerRepository(context);
+
+        var questionId = Guid.Parse(id);
+
+        var answerCount = RepositoryData.ExpectedAnswers.Count(x => x.QuestionId == questionId);
+
+        var result = await answerRepository.GetAllByQuestionIdAsync(questionId);
+
+        Assert.That(result.Count, Is.EqualTo(answerCount), message: "actual and expected counts are not equal");
+    }
+
+
+
 }

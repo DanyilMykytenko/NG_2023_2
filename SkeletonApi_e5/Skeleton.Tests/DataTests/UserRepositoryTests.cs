@@ -13,7 +13,7 @@ public class UserRepositoryTests
     public async Task UserRepository_GetByIdAsync_ReturnsValue(string id)
     {
         // arrange
-        
+
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
         var userRepository = new UserRepository(context);
 
@@ -24,7 +24,7 @@ public class UserRepositoryTests
         var result = await userRepository.GetByIdAsync(Guid.Parse(id));
 
         // assert
-        
+
         Assert.IsNotNull(result, message: "Expected not null");
         Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()), message: "Result is invalid");
     }
@@ -36,8 +36,8 @@ public class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var result = await userRepository.GetAllAsync();
-        
-        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedUsers).Using(new UserEqualityComparer()), 
+
+        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedUsers).Using(new UserEqualityComparer()),
             message: "Results are not equal to expected");
     }
 
@@ -51,10 +51,10 @@ public class UserRepositoryTests
 
         await userRepository.AddAsync(newUser);
         await context.SaveChangesAsync();
-        
+
         Assert.That(context.Users.Count(), !Is.EqualTo(RepositoryData.ExpectedUsers.Count()), message: "AddAsync works");
     }
-    
+
     [Test]
     public async Task UserRepository_UpdateAsync_ValueUpdated()
     {
@@ -73,7 +73,7 @@ public class UserRepositoryTests
 
         await userRepository.UpdateAsync(user);
         await context.SaveChangesAsync();
-        
+
         Assert.That(user, !Is.EqualTo(notExpected), message: "UpdateAsync works");
     }
 
@@ -89,5 +89,22 @@ public class UserRepositoryTests
         await context.SaveChangesAsync();
 
         Assert.That(context.Users.Count(), !Is.EqualTo(RepositoryData.ExpectedUsers.Count()), message: "DeleteByIdAsync works incorrect");
+    }
+
+    [Test]
+    public async Task UserRepository_GetUserByCredentialsAsync_CredentialsAreCorrect_UserReturned()
+    {
+        using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
+
+        var userRepository = new UserRepository(context);
+
+        var name = "Name2";
+        var password = "drowssaP";
+
+        var expected = RepositoryData.ExpectedUsers.FirstOrDefault(x => x.Name == name && x.Password == password);
+        
+        var result = await userRepository.GetUserByCredentialsAsync(name, password);
+
+        Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()), message: "User is invalid, and me too");
     }
 }

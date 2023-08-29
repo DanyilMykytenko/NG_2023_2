@@ -16,7 +16,7 @@ public class TestRepositoryTests
     public async Task TestRepository_GetByIdAsync_ReturnsValue(string id)
     {
         // arrange
-        
+
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
         var testRepository = new TestRepository(context);
 
@@ -27,7 +27,7 @@ public class TestRepositoryTests
         var result = await testRepository.GetByIdAsync(Guid.Parse(id));
 
         // assert
-        
+
         Assert.IsNotNull(result, message: "Expected not null");
         Assert.That(result, Is.EqualTo(expected).Using(new TestEqualityComparer()), message: "Result is invalid");
     }
@@ -39,8 +39,8 @@ public class TestRepositoryTests
         var testRepository = new TestRepository(context);
 
         var result = await testRepository.GetAllAsync();
-        
-        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedTests).Using(new TestEqualityComparer()), 
+
+        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedTests).Using(new TestEqualityComparer()),
             message: "Results are not equal to expected");
     }
 
@@ -54,10 +54,10 @@ public class TestRepositoryTests
 
         await testRepository.AddAsync(newTest);
         await context.SaveChangesAsync();
-        
+
         Assert.That(context.Tests.Count(), Is.EqualTo(4), message: "AddAsync works");
     }
-    
+
     [Test]
     public async Task TestRepository_UpdateAsync_ValueUpdated()
     {
@@ -69,13 +69,13 @@ public class TestRepositoryTests
         var test = new Test
         {
             Id = testId,
-            Title = "new title", 
+            Title = "new title",
             Description = "new description"
         };
 
         await testRepository.UpdateAsync(test);
         await context.SaveChangesAsync();
-        
+
         Assert.That(test, !Is.EqualTo(notExpected), message: "UpdateAsync works");
     }
 
@@ -92,5 +92,54 @@ public class TestRepositoryTests
 
         Assert.That(context.Tests.Count(), !Is.EqualTo(RepositoryData.ExpectedTests.Count()), message: "DeleteByIdAsync works incorrect");
     }
-    
+
+    [TestCase("f626f7b9-b1c0-4c0c-90c6-4246aced0c22")]
+    [TestCase("c9e3368b-601a-4f9a-b4f2-e2e207de3b54")]
+    public async Task TestRepository_GetByIdWithQuestionsAsync_TestWithQuestionsReturned(string id)
+    {
+        using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
+
+        var testRepository = new TestRepository(context);
+
+        var testId = Guid.Parse(id);
+
+        var questionCount = RepositoryData.ExpectedQuestions.Count(x => x.TestId == testId);
+
+        var result = await testRepository.GetByIdWithQuestionsAsync(testId);
+
+        Assert.That(result.Questions.Count, Is.EqualTo(questionCount), message: "Test's question count is incorrect");
+    }
+
+    [TestCase("f626f7b9-b1c0-4c0c-90c6-4246aced0c22")]
+    [TestCase("c9e3368b-601a-4f9a-b4f2-e2e207de3b54")]
+    public async Task TestRepository_GetDescriptionAsync_ReturnedDescriptionIsCorrect(string id)
+    {
+        using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
+
+        var testRepository = new TestRepository(context);
+
+        var testId = Guid.Parse(id);
+        var expectedDescription = RepositoryData.ExpectedTests.FirstOrDefault(x => x.Id == testId);
+
+        var description = await testRepository.GetDescriptionAsync(testId);
+
+        Assert.That(description, Is.EqualTo(expectedDescription), message: "Description is not correct");
+    }
+
+    [TestCase("585dbcf1-2a39-4e24-8b66-2339ab6bdbab")]
+    [TestCase("96865278-eff1-4be5-88a2-6d1272e2feeb")]
+    public async Task TestRepository_GetTestsByUserIdAsync_TestsAreReturned(string id)
+    {
+        using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
+
+        var testRepository = new TestRepository(context);
+
+        var userId = Guid.Parse(id);
+
+        var testCount = RepositoryData.ExpectedTests.Count(x => x.CreatedForUserId == userId);
+
+        var result = await testRepository.GetTestsByUserIdAsync(userId);
+
+        Assert.That(result.Count, Is.EqualTo(testCount), message: "actual and expected counts are not equal");
+    }
 }
