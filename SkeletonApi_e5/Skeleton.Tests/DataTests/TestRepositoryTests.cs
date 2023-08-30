@@ -119,7 +119,7 @@ public class TestRepositoryTests
         var testRepository = new TestRepository(context);
 
         var testId = Guid.Parse(id);
-        var expectedDescription = RepositoryData.ExpectedTests.FirstOrDefault(x => x.Id == testId);
+        var expectedDescription = RepositoryData.ExpectedTests.Select(x => x.Description).FirstOrDefault(x => x.Id == testId);
 
         var description = await testRepository.GetDescriptionAsync(testId);
 
