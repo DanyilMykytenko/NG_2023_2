@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Skeleton.DAL.Context;
 using Skeleton.DAL.Entities;
 
-namespace Skeleton.Tests;
+namespace Skeleton.DAL.Tests;
 
 internal static class UnitTestHelper
 {

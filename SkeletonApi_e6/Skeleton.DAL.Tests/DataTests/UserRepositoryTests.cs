@@ -1,15 +1,16 @@
-﻿using NUnit.Framework;
-using Skeleton.DAL.Context;
+﻿using Skeleton.DAL.Context;
 using Skeleton.DAL.Entities;
 using Skeleton.DAL.Repositories;
-using Skeleton.Tests.Data;
+using Skeleton.DAL.Tests.Data;
+using Xunit;
 
-namespace Skeleton.Tests.DataTests;
+namespace Skeleton.DAL.Tests.DataTests;
 
 public class UserRepositoryTests
 {
-    [TestCase("585dbcf1-2a39-4e24-8b66-2339ab6bdbab")]
-    [TestCase("96865278-eff1-4be5-88a2-6d1272e2feeb")]
+    [Theory]
+    [InlineData("585dbcf1-2a39-4e24-8b66-2339ab6bdbab")]
+    [InlineData("96865278-eff1-4be5-88a2-6d1272e2feeb")]
     public async Task UserRepository_GetByIdAsync_ReturnsValue(string id)
     {
         // arrange
@@ -25,11 +26,11 @@ public class UserRepositoryTests
 
         // assert
 
-        Assert.IsNotNull(result, message: "Expected not null");
-        Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()), message: "Result is invalid");
+        Assert.NotNull(result);
+        Assert.Equal(expected, result, new UserEqualityComparer());
     }
 
-    [Test]
+    [Fact]
     public async Task UserRepository_GetAllAsync_ReturnsAllValues()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -37,11 +38,10 @@ public class UserRepositoryTests
 
         var result = await userRepository.GetAllAsync();
 
-        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedUsers).Using(new UserEqualityComparer()),
-            message: "Results are not equal to expected");
+        Assert.Equal(RepositoryData.ExpectedUsers, result, new UserEqualityComparer());
     }
 
-    [Test]
+    [Fact]
     public async Task UserRepository_AddAsync_AddsValueToDatabase()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -52,10 +52,10 @@ public class UserRepositoryTests
         await userRepository.AddAsync(newUser);
         await context.SaveChangesAsync();
 
-        Assert.That(context.Users.Count(), !Is.EqualTo(RepositoryData.ExpectedUsers.Count()), message: "AddAsync works");
+        Assert.NotEqual(RepositoryData.ExpectedUsers.Count(), context.Users.Count());
     }
 
-    [Test]
+    [Fact]
     public async Task UserRepository_UpdateAsync_ValueUpdated()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -74,11 +74,12 @@ public class UserRepositoryTests
         await userRepository.UpdateAsync(user);
         await context.SaveChangesAsync();
 
-        Assert.That(user, !Is.EqualTo(notExpected), message: "UpdateAsync works");
+        Assert.NotEqual(notExpected, user);
     }
 
-    [TestCase("585dbcf1-2a39-4e24-8b66-2339ab6bdbab")]
-    [TestCase("96865278-eff1-4be5-88a2-6d1272e2feeb")]
+    [Theory]
+    [InlineData("585dbcf1-2a39-4e24-8b66-2339ab6bdbab")]
+    [InlineData("96865278-eff1-4be5-88a2-6d1272e2feeb")]
     public async Task UserRepository_DeleteAsync_ObjectIsDeleted(string id)
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -88,10 +89,10 @@ public class UserRepositoryTests
         await userRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.That(context.Users.Count(), !Is.EqualTo(RepositoryData.ExpectedUsers.Count()), message: "DeleteByIdAsync works incorrect");
+        Assert.NotEqual(RepositoryData.ExpectedUsers.Count(), context.Users.Count());
     }
 
-    [Test]
+    [Fact]
     public async Task UserRepository_GetUserByCredentialsAsync_CredentialsAreCorrect_UserReturned()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -105,6 +106,6 @@ public class UserRepositoryTests
         
         var result = await userRepository.GetUserByCredentialsAsync(name, password);
 
-        Assert.That(result, Is.EqualTo(expected).Using(new UserEqualityComparer()), message: "User is invalid, and me too");
+        Assert.Equal(expected, result , new UserEqualityComparer()!);
     }
 }

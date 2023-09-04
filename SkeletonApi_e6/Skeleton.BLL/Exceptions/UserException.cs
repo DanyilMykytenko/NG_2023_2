@@ -1,8 +1,8 @@
 ﻿namespace Skeleton.BLL.Exceptions;
 
-public class UserNotFoundExceptionException : Exception
+public class UserNotFoundException : Exception
 {
-    public UserNotFoundExceptionException()
+    public UserNotFoundException()
         : base($"Such user doesn't exist")
     {
     }
@@ -14,5 +14,13 @@ public class UserRegistrationFailedException : Exception
         : base($"User with password {password} already exists")
     {
         // easter egg
+    }
+}
+
+public class UserModelEmptyFieldException : Exception
+{
+    public UserModelEmptyFieldException()
+        : base($"Name, Surname or Password fields were empty")
+    {
     }
 }

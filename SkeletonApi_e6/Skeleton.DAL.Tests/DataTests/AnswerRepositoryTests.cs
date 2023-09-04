@@ -1,15 +1,16 @@
-﻿using NUnit.Framework;
-using Skeleton.DAL.Context;
+﻿using Skeleton.DAL.Context;
 using Skeleton.DAL.Entities;
 using Skeleton.DAL.Repositories;
-using Skeleton.Tests.Data;
+using Skeleton.DAL.Tests.Data;
+using Xunit;
 
-namespace Skeleton.Tests.DataTests;
+namespace Skeleton.DAL.Tests.DataTests;
 
 public class AnswerRepositoryTests
 {
-    [TestCase("d8d06d13-6a7e-417c-bbdb-76f9c6a1cfab")]
-    [TestCase("6225b805-399f-47eb-8b37-b4ed4c286914")]
+    [Theory]
+    [InlineData("d8d06d13-6a7e-417c-bbdb-76f9c6a1cfab")]
+    [InlineData("6225b805-399f-47eb-8b37-b4ed4c286914")]
     public async Task AnswerRepository_GetByIdAsync_ReturnsValue(string id)
     {
         // arrange
@@ -25,11 +26,11 @@ public class AnswerRepositoryTests
 
         // assert
         
-        Assert.IsNotNull(result, message: "Expected not null");
-        Assert.That(result, Is.EqualTo(expected).Using(new AnswerEqualityComparer()), message: "Result is invalid");
+        Assert.NotNull(result);
+        Assert.Equal( expected, result, new AnswerEqualityComparer()!);
     }
 
-    [Test]
+    [Fact]
     public async Task AnswerRepository_GetAllAsync_ReturnsAllValues()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -37,11 +38,10 @@ public class AnswerRepositoryTests
 
         var result = await answerRepository.GetAllAsync();
         
-        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedAnswers).Using(new AnswerEqualityComparer()), 
-            message: "Results are not equal to expected");
+        Assert.Equal(RepositoryData.ExpectedAnswers, result, new AnswerEqualityComparer());
     }
 
-    [Test]
+    [Fact]
     public async Task AnswerRepository_AddAsync_AddsValueToDatabase()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -52,10 +52,10 @@ public class AnswerRepositoryTests
         await answerRepository.AddAsync(newAnswer);
         await context.SaveChangesAsync();
         
-        Assert.That(context.Answers.Count(), !Is.EqualTo(RepositoryData.ExpectedAnswers.Count()), message: "AddAsync works");
+        Assert.Equal(RepositoryData.ExpectedAnswers.Count(), context.Answers.Count());
     }
     
-    [Test]
+    [Fact]
     public async Task AnswerRepository_UpdateAsync_ValueUpdated()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -72,11 +72,12 @@ public class AnswerRepositoryTests
         await answerRepository.UpdateAsync(answer);
         await context.SaveChangesAsync();
         
-        Assert.That(answer, !Is.EqualTo(notExpected), message: "UpdateAsync works");
+        Assert.NotEqual(notExpected, answer);
     }
 
-    [TestCase("6225b805-399f-47eb-8b37-b4ed4c286914")]
-    [TestCase("b1a30461-2173-416b-8281-a227c5cff8f7")]
+    [Theory]
+    [InlineData("6225b805-399f-47eb-8b37-b4ed4c286914")]
+    [InlineData("b1a30461-2173-416b-8281-a227c5cff8f7")]
     public async Task AnswerRepository_DeleteAsync_ObjectIsDeleted(string id)
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -86,11 +87,12 @@ public class AnswerRepositoryTests
         await answerRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.That(context.Answers.Count(), !Is.EqualTo(RepositoryData.ExpectedAnswers.Count()), message: "DeleteByIdAsync works incorrect");
+        Assert.NotEqual(RepositoryData.ExpectedAnswers.Count(), context.Answers.Count());
     }
 
-    [TestCase("aa6cc972-2650-44c3-8a8e-134e4e7cf8df")]
-    [TestCase("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
+    [Theory]
+    [InlineData("aa6cc972-2650-44c3-8a8e-134e4e7cf8df")]
+    [InlineData("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
     public async Task AnswerRepository_GetAllByQuestionIdAsync_AnswersAreReturned(string id)
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -103,9 +105,6 @@ public class AnswerRepositoryTests
 
         var result = await answerRepository.GetAllByQuestionIdAsync(questionId);
 
-        Assert.That(result.Count, Is.EqualTo(answerCount), message: "actual and expected counts are not equal");
+        Assert.Equal(answerCount, result.Count());
     }
-
-
-
 }

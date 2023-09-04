@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Skeleton.DAL.Entities;
 
-namespace Skeleton.Tests;
+namespace Skeleton.DAL.Tests;
 
 internal class TestEqualityComparer : IEqualityComparer<Test>
 {

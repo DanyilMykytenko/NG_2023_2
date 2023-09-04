@@ -1,15 +1,16 @@
-﻿using NUnit.Framework;
-using Skeleton.DAL.Context;
+﻿using Skeleton.DAL.Context;
 using Skeleton.DAL.Entities;
 using Skeleton.DAL.Repositories;
-using Skeleton.Tests.Data;
+using Skeleton.DAL.Tests.Data;
+using Xunit;
 
-namespace Skeleton.Tests.DataTests;
+namespace Skeleton.DAL.Tests.DataTests;
 
 public class QuestionRepositoryTests
 {
-    [TestCase("1969fe97-30b0-4f96-998a-bdc70d88d2cc")]
-    [TestCase("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
+    [Theory]
+    [InlineData("1969fe97-30b0-4f96-998a-bdc70d88d2cc")]
+    [InlineData("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
     public async Task QuestionRepository_GetByIdAsync_ReturnsValue(string id)
     {
         // arrange
@@ -25,11 +26,11 @@ public class QuestionRepositoryTests
 
         // assert
         
-        Assert.IsNotNull(result, message: "Expected not null");
-        Assert.That(result, Is.EqualTo(expected).Using(new QuestionEqualityComparer()), message: "Result is invalid");
+        Assert.NotNull(result);
+        Assert.Equal(expected, result, new QuestionEqualityComparer()!);
     }
 
-    [Test]
+    [Fact]
     public async Task QuestionRepository_GetAllAsync_ReturnsAllValues()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -37,11 +38,10 @@ public class QuestionRepositoryTests
 
         var result = await questionRepository.GetAllAsync();
         
-        Assert.That(result, Is.EqualTo(RepositoryData.ExpectedQuestions).Using(new QuestionEqualityComparer()), 
-            message: "Results are not equal to expected");
+        Assert.Equal(RepositoryData.ExpectedQuestions, result, new QuestionEqualityComparer());
     }
 
-    [Test]
+    [Fact]
     public async Task QuestionRepository_AddAsync_AddsValueToDatabase()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -52,10 +52,10 @@ public class QuestionRepositoryTests
         await questionRepository.AddAsync(newQuestion);
         await context.SaveChangesAsync();
         
-        Assert.That(context.Questions.Count(), !Is.EqualTo(RepositoryData.ExpectedQuestions.Count()), message: "AddAsync works");
+        Assert.NotEqual(RepositoryData.ExpectedQuestions.Count(), context.Questions.Count());
     }
     
-    [Test]
+    [Fact]
     public async Task QuestionRepository_UpdateAsync_ValueUpdated()
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -72,11 +72,12 @@ public class QuestionRepositoryTests
         await questionRepository.UpdateAsync(question);
         await context.SaveChangesAsync();
         
-        Assert.That(question, !Is.EqualTo(notExpected), message: "UpdateAsync works");
+        Assert.NotEqual(notExpected, question);
     }
 
-    [TestCase("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
-    [TestCase("ed20c0a6-dbc7-4f2f-9b4d-e57616f40c78")]
+    [Theory]
+    [InlineData("a5d6c657-688b-4c0e-a96a-9a66cab342af")]
+    [InlineData("ed20c0a6-dbc7-4f2f-9b4d-e57616f40c78")]
     public async Task QuestionRepository_DeleteAsync_ObjectIsDeleted(string id)
     {
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
@@ -86,6 +87,6 @@ public class QuestionRepositoryTests
         await questionRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.That(context.Questions.Count(), !Is.EqualTo(RepositoryData.ExpectedQuestions.Count()), message: "DeleteByIdAsync works incorrect");
+        Assert.NotEqual(RepositoryData.ExpectedQuestions.Count(), context.Questions.Count());
     }
 }

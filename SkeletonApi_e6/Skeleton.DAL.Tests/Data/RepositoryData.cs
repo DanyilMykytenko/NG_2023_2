@@ -1,6 +1,6 @@
 ﻿using Skeleton.DAL.Entities;
 
-namespace Skeleton.Tests.Data;
+namespace Skeleton.DAL.Tests.Data;
 
 public static class RepositoryData
 {
