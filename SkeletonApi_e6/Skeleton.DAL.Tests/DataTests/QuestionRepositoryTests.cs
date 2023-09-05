@@ -52,7 +52,7 @@ public class QuestionRepositoryTests
         await questionRepository.AddAsync(newQuestion);
         await context.SaveChangesAsync();
         
-        Assert.NotEqual(RepositoryData.ExpectedQuestions.Count(), context.Questions.Count());
+        Assert.Equal(RepositoryData.ExpectedQuestions.Count() + 1, context.Questions.Count());
     }
     
     [Fact]
@@ -72,7 +72,7 @@ public class QuestionRepositoryTests
         await questionRepository.UpdateAsync(question);
         await context.SaveChangesAsync();
         
-        Assert.NotEqual(notExpected, question);
+        Assert.NotEqual(notExpected, question, new QuestionEqualityComparer()!);
     }
 
     [Theory]
@@ -87,6 +87,6 @@ public class QuestionRepositoryTests
         await questionRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(RepositoryData.ExpectedQuestions.Count(), context.Questions.Count());
+        Assert.Equal(RepositoryData.ExpectedQuestions.Count() - 1, context.Questions.Count());
     }
 }

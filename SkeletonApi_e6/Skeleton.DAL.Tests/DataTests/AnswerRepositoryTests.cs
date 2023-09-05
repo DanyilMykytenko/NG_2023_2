@@ -47,12 +47,12 @@ public class AnswerRepositoryTests
         using var context = new QuizHubDatabaseContext(UnitTestHelper.GetUnitTestsDbOptions());
         var answerRepository = new AnswerRepository(context);
 
-        var newAnswer = new Answer { Text = "New question" };
+        var newAnswer = new Answer { Text = "New answer" };
 
         await answerRepository.AddAsync(newAnswer);
         await context.SaveChangesAsync();
         
-        Assert.Equal(RepositoryData.ExpectedAnswers.Count(), context.Answers.Count());
+        Assert.Equal(RepositoryData.ExpectedAnswers.Count() + 1, context.Answers.Count());
     }
     
     [Fact]
@@ -72,7 +72,7 @@ public class AnswerRepositoryTests
         await answerRepository.UpdateAsync(answer);
         await context.SaveChangesAsync();
         
-        Assert.NotEqual(notExpected, answer);
+        Assert.NotEqual(notExpected, answer, new AnswerEqualityComparer()!);
     }
 
     [Theory]
@@ -87,7 +87,7 @@ public class AnswerRepositoryTests
         await answerRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(RepositoryData.ExpectedAnswers.Count(), context.Answers.Count());
+        Assert.Equal(RepositoryData.ExpectedAnswers.Count() - 1, context.Answers.Count());
     }
 
     [Theory]

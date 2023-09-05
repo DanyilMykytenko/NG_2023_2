@@ -27,7 +27,7 @@ public class UserRepositoryTests
         // assert
 
         Assert.NotNull(result);
-        Assert.Equal(expected, result, new UserEqualityComparer());
+        Assert.Equal(expected, result, new UserEqualityComparer()!);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class UserRepositoryTests
         await userRepository.AddAsync(newUser);
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(RepositoryData.ExpectedUsers.Count(), context.Users.Count());
+        Assert.Equal(RepositoryData.ExpectedUsers.Count() + 1, context.Users.Count());
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class UserRepositoryTests
         await userRepository.UpdateAsync(user);
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(notExpected, user);
+        Assert.NotEqual(notExpected, user, new UserEqualityComparer()!);
     }
 
     [Theory]
@@ -89,7 +89,7 @@ public class UserRepositoryTests
         await userRepository.DeleteAsync(Guid.Parse(id));
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(RepositoryData.ExpectedUsers.Count(), context.Users.Count());
+        Assert.Equal(RepositoryData.ExpectedUsers.Count() - 1, context.Users.Count());
     }
 
     [Fact]

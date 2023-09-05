@@ -74,7 +74,7 @@ public class TestRepositoryTests
         await testRepository.UpdateAsync(test);
         await context.SaveChangesAsync();
 
-        Assert.NotEqual(notExpected, test);
+        Assert.NotEqual(notExpected, test, new TestEqualityComparer()!);
     }
 
     [Theory]
