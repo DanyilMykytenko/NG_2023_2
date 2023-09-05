@@ -24,4 +24,9 @@ public class TestRepository : BaseRepository<Test>, ITestRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<Test> GetWithQuestionsAndAnswerAsync(Guid id)
+    {
+        throw new NotImplementedException();
+    }
 }
