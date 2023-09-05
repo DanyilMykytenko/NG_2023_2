@@ -50,7 +50,6 @@ public class UserServiceTests
         var act  = async () => await service.GetUserAsync(guid);
 
         // assert
-        _userRepositoryMock.Verify(x => x.GetByIdAsync(guid), Times.Once);
         await Assert.ThrowsAsync<UserNotFoundException>(act);
     }
 

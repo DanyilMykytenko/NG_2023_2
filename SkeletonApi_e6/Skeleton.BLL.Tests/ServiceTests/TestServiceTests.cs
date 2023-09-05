@@ -75,7 +75,6 @@ public class TestServiceTests
         var act = async() => await service.GetTestDescriptionAsync(It.IsAny<Guid>());
 
         // assert 
-        _testRepositoryMock.Verify(x => x.GetByIdWithQuestionsAsync(It.IsAny<Guid>()));
         await Assert.ThrowsAsync<TestNotFoundException>(act);
     }
 

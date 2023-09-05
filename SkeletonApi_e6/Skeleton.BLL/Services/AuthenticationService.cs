@@ -15,13 +15,6 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<Guid> AuthenticateAsync(string surname, string password)
     {
-        var result = await _userRepository.GetUserByCredentialsAsync(surname, password);
-
-        if (result is null)
-        {
-            throw new AuthException();
-        }
-
-        return result.Id;
+        throw new NotImplementedException();
     }
 }

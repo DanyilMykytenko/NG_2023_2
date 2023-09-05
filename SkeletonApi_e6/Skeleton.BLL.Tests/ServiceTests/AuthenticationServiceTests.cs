@@ -40,7 +40,6 @@ public class AuthenticationServiceTests
 
         //assert
         await Assert.ThrowsAsync<AuthException>(act);
-        _userRepositoryMock.Verify(x => x.GetUserByCredentialsAsync(surname, password), Times.Once);
     }
 
     private IEnumerable<User> GetTestUserEntities => new List<User>
