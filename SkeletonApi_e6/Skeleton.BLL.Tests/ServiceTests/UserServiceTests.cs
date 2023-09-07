@@ -94,8 +94,10 @@ public class UserServiceTests
     public async Task UpdateUserAsync_ValidData_UserUpdated()
     {
         // arrange
+        _userRepositoryMock.Setup(m => m.GetByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(It.IsAny<User>());
         _mapperMock.Setup(m => m.Map<UpdateUserModel, User>
-            (It.IsAny<UpdateUserModel>())).Returns(new User());
+            (It.IsAny<UpdateUserModel>(), It.IsAny<User>())).Returns(new User());
         _userRepositoryMock.Setup(m => m.UpdateAsync(It.IsAny<User>()));
 
         var service = new UserService(_userRepositoryMock.Object, _mapperMock.Object);
@@ -105,16 +107,18 @@ public class UserServiceTests
         await service.UpdateUserAsync(updated);
 
         // assert
-        _mapperMock.Verify(x => x.Map<User>(updated));
-        _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()));
+        _mapperMock.Verify(x => x.Map(updated, It.IsAny<User>()));
+        _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<User>()));
     }
 
     [Fact]
     public async Task UpdateUserAsync_ModelHasEmptyFields_ThrowsUserModelEmptyFieldException()
     {
         // arrange
+        _userRepositoryMock.Setup(m => m.GetByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(It.IsAny<User>());
         _mapperMock.Setup(m => m.Map<UpdateUserModel, User>
-            (It.IsAny<UpdateUserModel>())).Returns(new User());
+            (It.IsAny<UpdateUserModel>(), It.IsAny<User>())).Returns(new User());
         _userRepositoryMock.Setup(m => m.UpdateAsync(It.IsAny<User>()));
 
         var service = new UserService(_userRepositoryMock.Object, _mapperMock.Object);

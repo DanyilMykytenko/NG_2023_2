@@ -120,9 +120,9 @@ public class TestServiceTests
         _testRepositoryMock.Setup(m => m.GetWithQuestionsAndAnswerAsync(testId))
             .ReturnsAsync(new Test() { Id = testId });
         _testRepositoryMock.Setup(m => m.UpdateAsync(It.Is<Test>(t => t.Id == testId)));
-        _mapperMock.Setup(m => m.Map<UpdateTestModel, Test>(It.Is<UpdateTestModel>(t => t.Id == testId.ToString())))
+        _mapperMock.Setup(m => m.Map(It.Is<UpdateTestModel>(t => t.Id == testId.ToString()), It.IsAny<Test>()))
             .Returns(new Test() { Id = testId });
-
+        
         var service = new TestService(_testRepositoryMock.Object, _mapperMock.Object);
         
         // act 
@@ -130,7 +130,7 @@ public class TestServiceTests
         
         // assert
         _testRepositoryMock.Verify(x => x.GetWithQuestionsAndAnswerAsync(testId));
-        _mapperMock.Verify(x => x.Map<Test>(It.Is<UpdateTestModel>(t => t.Id == testId.ToString())));
+        _mapperMock.Verify(x => x.Map(It.Is<UpdateTestModel>(t => t.Id == testId.ToString()), It.IsAny<Test>()));
         _testRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Test>(t => t.Id == testId)));
     }
 
