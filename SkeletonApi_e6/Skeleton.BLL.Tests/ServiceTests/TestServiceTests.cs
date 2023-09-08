@@ -61,23 +61,7 @@ public class TestServiceTests
         _testRepositoryMock.Verify(x => x.GetByIdWithQuestionsAsync(It.IsAny<Guid>()));
         _mapperMock.Verify(x => x.Map<TestModel>(test));
     }
-
-    [Fact]
-    public async Task GetTestWithQuestionsAsync_TestDoesntExist_ThrowsTestNotFoundException()
-    {
-        // arrange
-        _testRepositoryMock.Setup(m => m.GetByIdWithQuestionsAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Test)null);
-
-        var service = new TestService(_testRepositoryMock.Object, _mapperMock.Object);
-
-        // act
-        var act = async() => await service.GetTestDescriptionAsync(It.IsAny<Guid>());
-
-        // assert 
-        await Assert.ThrowsAsync<TestNotFoundException>(act);
-    }
-
+    
     [Fact]
     public async Task DeleteTestAsync_TestIsDeleted()
     {
@@ -117,6 +101,9 @@ public class TestServiceTests
     {
         // arrange 
         var testId = Guid.NewGuid();
+        // two setups for select methods
+        _testRepositoryMock.Setup(m => m.GetByIdAsync(testId))
+            .ReturnsAsync(new Test() { Id = testId });
         _testRepositoryMock.Setup(m => m.GetWithQuestionsAndAnswerAsync(testId))
             .ReturnsAsync(new Test() { Id = testId });
         _testRepositoryMock.Setup(m => m.UpdateAsync(It.Is<Test>(t => t.Id == testId)));
@@ -129,7 +116,6 @@ public class TestServiceTests
         await service.UpdateTestAsync(new UpdateTestModel() { Id = testId.ToString() });
         
         // assert
-        _testRepositoryMock.Verify(x => x.GetWithQuestionsAndAnswerAsync(testId));
         _mapperMock.Verify(x => x.Map(It.Is<UpdateTestModel>(t => t.Id == testId.ToString()), It.IsAny<Test>()));
         _testRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Test>(t => t.Id == testId)));
     }

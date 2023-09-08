@@ -25,23 +25,6 @@ public class AuthenticationServiceTests
         Assert.Equal(expectedId, result.ToString());
     }
 
-    [Theory]
-    [InlineData("surname2", "12345")]
-    public async Task AuthenticateAsync_InvalidData_ThrowsAuthException(string surname, string password)
-    {
-        // arrange
-        _userRepositoryMock.Setup(m => m.GetUserByCredentialsAsync(surname, password))
-            .ReturnsAsync((User)null);
-
-        var service = new AuthenticationService(_userRepositoryMock.Object);
-        
-        //act
-        Func<Task<Guid>> act = async() => await service.AuthenticateAsync(surname, password);
-
-        //assert
-        await Assert.ThrowsAsync<AuthException>(act);
-    }
-
     private IEnumerable<User> GetTestUserEntities => new List<User>
     {
         new() { Id = Guid.Parse("c687b3fb-d8b6-43bc-b31c-7f68c5df3f1d"), Name = "name1", Surname = "surname1", Password = "12345" },

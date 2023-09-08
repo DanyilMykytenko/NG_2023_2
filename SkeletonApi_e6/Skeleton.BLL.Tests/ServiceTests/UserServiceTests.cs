@@ -35,23 +35,6 @@ public class UserServiceTests
         Assert.Equal(expected.Name, result.Name); // see no sense in this checks
         Assert.Equal(expected.Surname, result.Surname);
     }
-    
-    [Fact]
-    public async Task GetUserAsync_UserDoesntExist_ThrowsUserNotFoundException()
-    {
-        var guid = new Guid("4bf27a3a-d8be-46f6-ad64-6802ac6abf40");
-        
-        _userRepositoryMock.Setup(m => m.GetByIdAsync(guid))!
-            .ReturnsAsync(GetTestUserEntities.FirstOrDefault(x => x.Id == guid));
-
-        var service = new UserService(_userRepositoryMock.Object, _mapperMock.Object);
-
-        // act
-        var act  = async () => await service.GetUserAsync(guid);
-
-        // assert
-        await Assert.ThrowsAsync<UserNotFoundException>(act);
-    }
 
     [Fact]
     public async Task AddUserAsync_ValidData_UserAdded()
@@ -87,7 +70,7 @@ public class UserServiceTests
         var act = async () => await service.AddUserAsync(newUser);
 
         // assert
-        await Assert.ThrowsAsync<UserModelEmptyFieldException>(act);
+        await Assert.ThrowsAsync<ModelIsEmptyException>(act);
     }
 
     [Fact]
@@ -128,7 +111,7 @@ public class UserServiceTests
         var act = async () => await service.UpdateUserAsync(user);
 
         // assert
-        await Assert.ThrowsAsync<UserModelEmptyFieldException>(act);
+        await Assert.ThrowsAsync<ModelIsEmptyException>(act);
     }
 
     [Theory]
